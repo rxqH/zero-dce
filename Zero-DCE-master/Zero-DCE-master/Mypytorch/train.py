@@ -1,6 +1,7 @@
 
 
 import torchvision
+from tensorboardX import SummaryWriter
 from torch import nn
 from torch.utils.data import DataLoader
 
@@ -39,6 +40,9 @@ total_test_step = 0
 # 训练的轮数
 epoch = 10
 
+# 添加tensorboard
+writer=SummaryWriter("logs_train")
+
 for i in range(epoch):
     print("----------第{}轮开始训练----------".format(i+1))
     for data in train_dataloader:
@@ -54,6 +58,7 @@ for i in range(epoch):
         total_train_step = total_train_step+1
         if total_train_step % 100 ==0:
             print("训练次数：{}，loss:{}".format(total_train_step,loss.item()))
+            writer.add_images("train_loss",loss.item,total_train_step)
 
     # 测试步骤开始
     total_test_loss = 0
@@ -64,5 +69,8 @@ for i in range(epoch):
             loss = loss_fn(outputs,targets)
             total_test_loss = total_test_loss+loss.item()
     print("整体测试集上的loss:{}".format(total_test_loss))
+    writer.add_images("test_loss",loss.item,total_test_step)
+    total_test_step = total_test_loss+1
 
+writer.close()
 
